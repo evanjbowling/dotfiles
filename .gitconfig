@@ -1,0 +1,10 @@
+# check proxy settings with:
+#
+# git config --list
+# git config http.proxy
+# git config --global core.editor emacs
+
+[http]
+        proxy = http://host:port
+[https]
+        proxy = http://host:port
