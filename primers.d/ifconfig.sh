@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env bash
 #
 # ifconfig -- configure network interface parameters
 #
