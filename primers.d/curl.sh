@@ -1,4 +1,4 @@
-#!/usr/bin/env
+#!/usr/bin/env bash
 
 # 1. simple curl request
 curl http://localhost:42/
