@@ -6,3 +6,6 @@
 
 # listen to all traffic on port 8000
 sudo tcpflow -i any -c port 8000
+
+# Docker usage
+docker run --rm --net=host appropriate/tcpflow -i any -c port 8000
