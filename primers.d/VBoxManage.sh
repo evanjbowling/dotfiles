@@ -7,4 +7,4 @@ VBoxManage
 VBoxManage list vms     # help w/ list command:   VBoxManage list
 
 # set the guest to use the same dns resolver as the host
-VBoxManage modifyvm "VM NAME" --natndshostresolver1 on
+VBoxManage modifyvm "VM NAME" --natdnshostresolver1 on
