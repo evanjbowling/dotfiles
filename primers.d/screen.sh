@@ -11,3 +11,6 @@ screen
 
 # 4. re-attach to screen session
 screen -r
+
+# 5. list screen sessions
+screen -list
