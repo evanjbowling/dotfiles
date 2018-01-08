@@ -1,0 +1,4 @@
+# append the following custom configurations to the ~/.i3/config file
+
+# prevent mouse move from changing focus
+focus_follows_mouse no
