@@ -2,9 +2,15 @@
 
 KEY=".ssh/..."
 
-# 0. generate ssh key
-# 1. copy ssh pub key to remote machine
-# 2. start ssh-agent (if not already running, check ps)
-# 3. add the key to ssh-agent
-ssh-add $KEY
+# largely adapated from github's instructions
+# generate 4096-bit rsa keys
+ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
+# inspect md5 fingerprint of key
+ssh-keygen -l -E md5 -f <KEYFILE>
+
+# Start ssh-agent in background
+eval "$(ssh-agent -s)"             # Agent pid XXXXX
+
+# add SSH private key to ssh-agent
+ssh-add -K <KEYFILE>
