@@ -6,7 +6,7 @@ KEY=".ssh/..."
 # generate 4096-bit rsa keys
 ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
 
-# inspect md5 fingerprint of key
+# inspect md5 fingerprint of key (default displayed on github)
 ssh-keygen -l -E md5 -f <KEYFILE>
 
 # Start ssh-agent in background
