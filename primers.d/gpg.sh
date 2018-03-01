@@ -21,21 +21,24 @@ echo "1234" | gpg -o /dev/null --local-user <KEYID> -as - && echo
 # list public keys
 gpg --list-keys
 
+# list fingerprint
+gpg --fingerprint "<REAL NAME>"
+
 # list private keys
 gpg --list-secret-keys
-# sec   ALGBITS YYYY-MM-DD [FLAG] [expires: YYYY-MM-DD]
+# sec#? ALGBITS YYYY-MM-DD [FLAG] [expires: YYYY-MM-DD]
 #       <FINGERPRINT>
 # uid           [<TRUST-STATUS>]   
 # sub   ALGBITS YYYY-MM-DD [FLAG]
 
 # list private keys with key ID
 gpg --list-secret-keys --keyid-format LONG
-# sec   ALGBITS/KEYID YYYY-MM-DD [FLAG] [expires: YYYY-MM-DD]
+# sec#? ALGBITS/KEYID YYYY-MM-DD [FLAG] [expires: YYYY-MM-DD]
 #       <FINGERPRINT>
 # uid           [<TRUST-STATUS>]   
 # sub   ALGBITS/KEYID YYYY-MM-DD [FLAG]
 
-# list fingerprint
-gpg --fingerprint "<REAL NAME>"
+# list keygrips
+gpg --list-key --with-keygrip <KEYID>
 
 
