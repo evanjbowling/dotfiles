@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Other references:
+#  * http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
 #  * https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/
 #  * https://wiki.debian.org/Subkeys
 # 
@@ -18,8 +19,8 @@ gpg --gen-key
 # confirm key passphrase
 echo "1234" | gpg -o /dev/null --local-user <KEYID> -as - && echo
 
-# list public keys
-gpg --list-keys
+# list public keys with key ID
+gpg --list-keys --keyid-format LONG
 
 # list fingerprint
 gpg --fingerprint "<REAL NAME>"
@@ -41,4 +42,10 @@ gpg --list-secret-keys --keyid-format LONG
 # list keygrips
 gpg --list-key --with-keygrip <KEYID>
 
+# export key in ASCII armor format (use the masterkeyid)
+gpg --armor --export <MASTERKEYID>
+# -----BEGIN PGP PUBLIC KEY BLOCK-----
+#
+# ...
+# ----END PGP PUBLIC KEY BLOCK-----
 
