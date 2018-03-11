@@ -1,10 +1,13 @@
-# check proxy settings with:
+# proxy settings
 #
 # git config --list
 # git config http.proxy
 # git config --global core.editor emacs
 
-[http]
-        proxy = http://host:port
-[https]
-        proxy = http://host:port
+#[http]
+#        proxy = http://host:port
+#[https]
+#        proxy = http://host:port
+# convenience aliases
+[alias]
+        lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
