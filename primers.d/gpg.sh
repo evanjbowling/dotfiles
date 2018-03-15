@@ -3,6 +3,7 @@
 #  * http://irtfweb.ifa.hawaii.edu/~lockhart/gpg/
 #  * https://davesteele.github.io/gpg/2014/09/20/anatomy-of-a-gpg-key/
 #  * https://wiki.debian.org/Subkeys
+#  * https://pgp.mit.edu/ - search for your key on MIT's pgp key server to ensure it was uploaded
 # 
 # Flag	gpg character	Description
 # 0x01	“C”	Key Certification
