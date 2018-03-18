@@ -1,0 +1,6 @@
+# export JAVA_HOME=""
+
+# add lein/tools to path
+export TOOLS_HOME="~/tools"
+export PATH="${PATH}:${TOOLS_HOME}"
+
