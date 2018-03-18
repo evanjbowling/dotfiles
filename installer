@@ -39,7 +39,19 @@ if [ $? -ne 0 ];then
   exit 1
 fi
 
-echo -e "${GREEN}Installed${NC}"
-cd ~/.ejb/dotfiles
+# check if tools directory exists
+if [ ! -d "~/tools" ];then
+  echo -e "${YELLOW}Creating tools directory${NC}"
+  mkdir ~/tools
+else
+  echo -e "${GREEN}~/tools directory is present${NC}"
+fi
 
-# TODO: run separate installer within dotfiles repo
+# run installers
+cd ~/.ejb/dotfiles/installer.d
+./staticfiles.sh
+./java.sh
+./lein.sh
+
+echo -e "${GREEN}Installed${NC}"
+
