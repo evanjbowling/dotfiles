@@ -1,13 +1,17 @@
-# proxy settings
-#
-# git config --list
-# git config http.proxy
-# git config --global core.editor emacs
+[core]
+        editor = vim
+[user]
+          name = "Evan Bowling"
+         email = "evan.j.bowling@gmail.com"
+    signingkey = "<TODO>" 
+[gpg]
+       program = gpg
+#      program = gpg2
 
 #[http]
 #        proxy = http://host:port
 #[https]
 #        proxy = http://host:port
-# convenience aliases
 [alias]
         lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+        lgt = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit

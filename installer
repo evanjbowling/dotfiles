@@ -6,7 +6,7 @@ YELLOW='\033[0;33m'
 RED='\033[0;31m'
 
 # create ~/.ejb directory if missing
-if [ ! -d "~/.ejb" ]; then
+if [ ! -d "${HOME}/.ejb" ]; then
   echo -e "${YELLOW}Creating ~/.ejb${NC}"
   mkdir ~/.ejb
 else
@@ -22,7 +22,7 @@ if [ $? -ne 0 ];then
 fi
 
 # navigate into directory and clone if missing
-cd ~/.ejb
+pushd ~/.ejb
 if [ ! -d "dotfiles" ];then
   echo -e "${YELLOW}Cloning dotfiles repo${NC}"
   git clone https://github.com/evanjbowling/dotfiles.git
@@ -32,6 +32,7 @@ else
   cd dotfiles
   git fetch && git pull
 fi
+popd
 
 # check if failure occurred with git updates
 if [ $? -ne 0 ];then
@@ -40,18 +41,19 @@ if [ $? -ne 0 ];then
 fi
 
 # check if tools directory exists
-if [ ! -d "~/tools" ];then
+if [ ! -d "${HOME}/tools" ];then
   echo -e "${YELLOW}Creating tools directory${NC}"
-  mkdir ~/tools
+  mkdir "${HOME}/tools"
 else
-  echo -e "${GREEN}~/tools directory is present${NC}"
+  echo -e "${GREEN}${HOME}/tools directory is present${NC}"
 fi
 
 # run installers
-cd ~/.ejb/dotfiles/installer.d
-./staticfiles.sh
-./java.sh
-./lein.sh
+# TODO: think about a local flag to trigger running from this dir
+#cd "${HOME}/.ejb/dotfiles/installer.d"
+./installer.d/staticfiles.sh
+./installer.d/java.sh
+./installer.d/lein.sh
 
 echo -e "${GREEN}Installed${NC}"
 
