@@ -8,3 +8,7 @@ RUN apt-get -y install vim \
                        openjdk-8-jdk                      
 
 ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+
+COPY src/docker/entry-point.sh /entry-point.sh
+
+ENTRYPOINT ["/entry-point.sh"]
