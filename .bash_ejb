@@ -5,3 +5,8 @@ export TOOLS_HOME="${HOME}/tools"
 export JAVA_HOME="${HOME}/tools/jdk"
 export PATH="${PATH}:${TOOLS_HOME}:${JAVA_HOME}/bin"
 
+# aliases
+alias chrome='google-chrome > ~/google-chrome.out 2> ~/google-chrome.err &'
+alias firefox='firefox > ~/firefox.out 2> ~/firefox.err &'
+alias ff='firefox'
+alias emacs="emacs -nw" # start emacs with --no-window-system
