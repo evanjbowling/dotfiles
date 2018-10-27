@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 NC='\033[0m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -50,10 +52,11 @@ fi
 
 # run installers
 # TODO: think about a local flag to trigger running from this dir
-#cd "${HOME}/.ejb/dotfiles/installer.d"
+pushd "${HOME}/.ejb/dotfiles"
 ./installer.d/staticfiles.sh
 ./installer.d/java.sh
 ./installer.d/lein.sh
 
 echo -e "${GREEN}Installed${NC}"
+echo -e "${YELLOW}You many need to: source ~/.bash_ejb${NC}"
 

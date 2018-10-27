@@ -1,9 +1,10 @@
 FROM ubuntu:16.04
 
-LABEL maintainer="evan.j.bowling@gmail.com"
+RUN apt-get -y update
+RUN apt-get -y upgrade
+RUN apt-get -y install vim \
+                       curl \
+                       git \
+                       openjdk-8-jdk                      
 
-RUN apt-get update -y
-RUN apt-get upgrade -y
-RUN apt-get install vim -y
-RUN apt-get install curl -y
-RUN apt-get install git -y
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
