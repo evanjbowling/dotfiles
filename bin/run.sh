@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker run -it dotfiles bash
+docker run -it dotfiles
