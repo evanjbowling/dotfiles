@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+echo "C-d to exit"
+docker run -it --rm haskell:8
