@@ -10,3 +10,4 @@ alias chrome='google-chrome > ~/google-chrome.out 2> ~/google-chrome.err &'
 alias firefox='firefox > ~/firefox.out 2> ~/firefox.err &'
 alias ff='firefox'
 alias emacs="emacs -nw" # start emacs with --no-window-system
+alias paths='echo $PATH | sed "s)\:)\n)g"'
