@@ -13,5 +13,9 @@
 #[https]
 #        proxy = http://host:port
 [alias]
+        d = diff
+        dc = diff --cached
+        dsc = diff --stat --cached
+        s = status
         lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
         lgt = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
