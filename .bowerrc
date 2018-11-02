@@ -1,4 +1,0 @@
-{
-    "proxy":"http://host:port",
-    "https-proxy":"http://host:port"
-}
