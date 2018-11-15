@@ -12,3 +12,9 @@ sudo tcpdump -i 8 #/en0/eth0
 
 # 4. listen to all tcp traffic
 sudo tcpdump -i any -q tcp
+
+# 5. ssh traffic
+sudo tcpdump "src port 22"
+
+# 6. https traffic
+sudo tcpdump "src port 443"
