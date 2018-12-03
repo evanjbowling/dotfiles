@@ -2,6 +2,28 @@
 
 Use this for cheating.
 
+## Selected Math Unicode Symbols
+
+Superscript
+
+| Char | Unicode |
+| ---- | ------- |
+| x¹   | U+00B9  |
+| x²   | U+00B2  |
+| x³   | U+00B3  |
+| x⁴   | U+2074  |
+| x⁵   | U+2075  |
+| x⁶   | U+2076  |
+| x⁷   | U+2077  |
+| x⁸   | U+2078  |
+| x⁹   | U+2079  |
+
+| Char | Unicode |
+| ---- | ------- |
+| x₀   | U+2080  |
+| x₁   | U+2081  |
+| x₂   | U+2082  |
+
 ## IDE ops
 
 | Op | IDE | Keyboard Shortcuts |
