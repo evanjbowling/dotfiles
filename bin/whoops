@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+# Purpose: Simple script for tracking programming mistakes as
+#          recordable event that can be aggregated/reviewed
+#          later.
+
+EVENT_FILE="$HOME/.whoops-events.txt"
+if [ ! -f "$EVENT_FILE" ]; then
+  echo "Creating event file: $EVENT_FILE"
+  touch $EVENT_FILE
+fi
+TIMESTAMP=`date +%s`
+# get topic
+echo -n " topic (eg. clj, java, py, unix): "
+read TOPIC
+echo -n " subtopic (eg. fn, class, module, cmd): "
+read SUBTOPIC
+echo -n " description:: "
+read DESCRIPTION
+EVENT="$TIMESTAMP | $TOPIC | $SUBTOPIC | $DESCRIPTION"
+echo "$EVENT" >> $EVENT_FILE
+echo "Created event: $EVENT"
