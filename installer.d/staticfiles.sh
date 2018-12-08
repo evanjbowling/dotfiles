@@ -41,3 +41,12 @@ if [ ! -f "${HOME}/.vimrc" ]; then
 else
   echo -e "${GREEN}${HOME}/.vimrc is installed${NC}"
 fi
+
+# check if ~/.gitconfig is installed
+if [ ! -f "${HOME}/.gitconfig" ]; then
+  echo -e "${YELLOW}${HOME}/.gitconfig is not installed${NC} - Installing"
+  cp ".gitconfig" "${HOME}"
+else
+  echo -e "${GREEN}${HOME}/.gitconfig is installed${NC}"
+fi
+
