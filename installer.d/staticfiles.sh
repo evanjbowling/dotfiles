@@ -23,6 +23,8 @@ else
   REF_TO_BASH_EJB=`cat "${HOME}/.bashrc" | grep "bash_ejb"`
   if [ -z "${REF_TO_BASH_EJB}" ]; then
     echo -e "${YELLOW}${HOME}/.bashrc does not contain ref to ${HOME}/.bash_ejb${NC} - Installing"
+    echo "" >> "${HOME}/.bashrc"
+    echo "# added by evanjbowling/dotfiles" >> "${HOME}/.bashrc"
     echo "if [ -f ${HOME}/.bash_ejb ]; then" >> "${HOME}/.bashrc"
     echo "  . ${HOME}/.bash_ejb" >> "${HOME}/.bashrc"
     echo "fi" >> "${HOME}/.bashrc"
@@ -32,3 +34,10 @@ else
   fi
 fi
 
+# check if ~/.vimrc is installed
+if [ ! -f "${HOME}/.vimrc" ]; then
+  echo -e "${YELLOW}${HOME}/.vimrc is not installed${NC} - Installing"
+  cp ".vimrc" "${HOME}"
+else
+  echo -e "${GREEN}${HOME}/.vimrc is installed${NC}"
+fi
