@@ -13,6 +13,7 @@
 #[https]
 #        proxy = http://host:port
 [alias]
+        c = commit
         d = diff
         dc = diff --cached
         dsc = diff --stat --cached
