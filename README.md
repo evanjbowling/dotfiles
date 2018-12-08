@@ -33,8 +33,7 @@ curl https://raw.githubusercontent.com/evanjbowling/dotfiles/master/installer > 
 The current test method builds a new ubuntu docker image and runs the quick install script within it.
 
 ```
-./devbin/run.sh
-source ~/.bash_ejb # TODO: find way to automate this
+./devbin/run && source ~/.bash_ejb # TODO: find way to automate the source call in the docker image
 ```
 ## Copyright
 

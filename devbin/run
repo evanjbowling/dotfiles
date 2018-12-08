@@ -1,3 +1,3 @@
 #!/usr/bin/env bash
-./devbin/build.sh
+./devbin/build
 docker run -it dotfiles
