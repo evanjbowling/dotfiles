@@ -35,6 +35,18 @@ The current test method builds a new ubuntu docker image and runs the quick inst
 ```
 ./devbin/run && source ~/.bash_ejb # TODO: find way to automate the source call in the docker image
 ```
+
+## Goals
+### In Scope
+* __easy access__ - aliases/code snippets I find useful
+* __reuse__ - configs for random systems (ie. even those that aren't considered production systems)
+* __learning__ - understand a bit more about production-grade system config tools like Ansible
+* __modular__ - (not realized yet)
+
+## Out of Scope
+* provide as many features as Ansible
+* Windows/cygwin
+
 ## Copyright
 
 Copyright (c) Evan Bowling. See [LICENSE](LICENSE).
