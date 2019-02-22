@@ -6,19 +6,14 @@
     signingkey = "<TODO>" 
 [gpg]
        program = gpg
-#      program = gpg2
 
-#[http]
-#        proxy = http://host:port
-#[https]
-#        proxy = http://host:port
 [alias]
         c = commit
         d = diff
         dc = diff --cached
         dsc = diff --stat --cached
         s = status
-        lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
-        lgt = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+        lg  = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+        lgb = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit --first-parent
 [push]
         default = simple
