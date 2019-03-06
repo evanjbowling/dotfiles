@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# 0. good goto
+od -A x -t x1z -v <FILE>
+
 # 1. select octal bytes
 od -b <FILE>
 

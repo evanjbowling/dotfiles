@@ -38,3 +38,8 @@ Superscript
 | copy region| emacs | `M-w` |
 | cut region | emacs | `C-w` |
 | paste | emacs | `C-y` |
+| kill to start of line | emacs | `C-x Backspace` |
+| kill to start of line | vi(m) | `d^` |
+| kill to end of line | emacs | `C-k` |
+| kill to end of line | vi(m) | `d$` |
+
