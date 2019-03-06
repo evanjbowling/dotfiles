@@ -10,7 +10,12 @@ git_ps1_prompt() {
   # if branch exists, print the branch surrounded by parens
   git branch 2> /dev/null | grep \* | sed -r 's|^\* (.*)|\(\1\)|'
 }
-export PS1="\$SHLVL \e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(git_ps1_prompt)\e[22m\e[39m\n$ "
+
+if [ $SHLVL -eq 1 ]; then
+  export PS1="\e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(git_ps1_prompt)\e[22m\e[39m\n$ "
+else
+  export PS1="\$SHLVL \e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(git_ps1_prompt)\e[22m\e[39m\n$ "
+fi
 
 # aliases
 alias chrome='google-chrome > ~/google-chrome.out 2> ~/google-chrome.err &'
