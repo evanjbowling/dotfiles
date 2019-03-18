@@ -50,3 +50,24 @@ else
   echo -e "${GREEN}${HOME}/.gitconfig is installed${NC}"
 fi
 
+# check if ~/.emacs.d is installed
+if [ ! -d "${HOME}/.emacs.d" ]; then
+  echo -e "${YELLOW}${HOME}/.emacs.d does not exist${NC} - Installing symlink"
+  ln -s "${PWD}/.emacs.d" "${HOME}/.emacs.d"
+  echo -e "${YELLOW}Running cask install"
+  pushd "${HOME}/.emacs.d" && cask install && popd
+else
+  if [ ! -L "${HOME}/.emacs.d" ]; then
+    echo -e "${RED}${HOME}/.emacs.d exists but is not a symbolic link${NC} - No Action Taken"
+  else
+    if [ ! `readlink "${HOME}/.emacs.d"` = "${PWD}/.emacs.d" ]; then
+      echo -e "${YELLOW}${HOME}/.emacs.d does not point to dotfiles source - Installing symlink"
+      unlink "${HOME}/.emacs.d"
+      ln -s "${PWD}/.emacs.d" "${HOME}/.emacs.d"
+      echo -e "${YELLOW}Running cask install"
+      pushd "${HOME}/.emacs.d" && cask install && popd
+    else
+      echo -e "${GREEN}/.emacs.d is installed and symlinked${NC}"
+    fi
+  fi
+fi

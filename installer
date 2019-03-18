@@ -50,6 +50,14 @@ else
   echo -e "${GREEN}${HOME}/tools directory is present${NC}"
 fi
 
+# check if cask exists
+type cask &> /dev/null
+if [ $? -ne 0 ];then
+  echo -e "${RED}ERROR: cask is not installed${NC}"
+  echo "Install cask and then rerun this script"
+  exit 1
+fi
+
 # run installers
 # TODO: think about a local flag to trigger running from this dir
 pushd "${HOME}/.ejb/dotfiles"
