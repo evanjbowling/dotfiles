@@ -51,6 +51,7 @@ else
 fi
 
 # check if ~/.emacs.d is installed
+# TODO: check if ~/.emacs.d/.cask directory exists (may need to run cask install)
 if [ ! -d "${HOME}/.emacs.d" ]; then
   echo -e "${YELLOW}${HOME}/.emacs.d does not exist${NC} - Installing symlink"
   ln -s "${PWD}/.emacs.d" "${HOME}/.emacs.d"
