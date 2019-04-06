@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+
+# Purpose:     simple utility for running various convenience
+#              git calls for multiple git repos
+# Assumptions: you store all your git repos under a common
+#              directory
+FORGIT_VERSION="0.0.1"
+
+usage() {
+  echo "USAGE: forgit (-v,--version|status)"
+  exit 1
+}
+
+print_version() {
+  echo "${FORGIT_VERSION}"
+}
+
+print_status() {
+  for d in `find . -type d -name ".git"`;
+  do
+    pushd `dirname $d` > /dev/null
+    RESULT=`git status --porcelain`
+    if [ "$RESULT" != "" ]; then
+      echo "$d"
+      echo "$RESULT"
+    fi
+    popd > /dev/null
+  done
+}
+
+if [ "$1" = "-v" ]; then
+  print_version
+elif [ "$1" = "-version" ]; then
+  print_version
+elif [ "$1" = "--version" ]; then
+  print_version
+elif [ "$1" = "status" ]; then
+  print_status
+else
+  usage
+fi
+
+
