@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-echo "C-d to exit"
-docker run -it --rm ocaml/opam ocaml # ocaml starts the repl session
