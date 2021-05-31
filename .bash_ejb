@@ -1,25 +1,21 @@
 #!/usr/bin/env bash
 
-# add tools/java to path
-export TOOLS_HOME="${HOME}/tools"
-export JAVA_HOME="${HOME}/tools/jdk"
-export PATH="${PATH}:${TOOLS_HOME}:${JAVA_HOME}/bin"
+EJBDOT_HOME="$HOME/.ejb/dotfiles"
+export PATH="${PATH}:${EJBDOT_HOME}/bin"
 
 # PS1
-git_ps1_prompt() {
-  # if branch exists, print the branch surrounded by parens
-  git branch 2> /dev/null | grep \* | sed -r 's|^\* (.*)|\(\1\)|'
+_git_ps1() {
+  local b=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+  if [ -z "$b" ]; then echo -n ""; else echo -n "($b)"; fi
 }
 
-if [ $SHLVL -eq 1 ]; then
-  export PS1="\e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(git_ps1_prompt)\e[22m\e[39m\n$ "
-else
-  export PS1="\$SHLVL \e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(git_ps1_prompt)\e[22m\e[39m\n$ "
-fi
+_shlvl_ps1() {
+  if [ $SHLVL -gt 1 ]; then echo -n "$SHLVL "; else echo -n ""; fi
+}
 
-# aliases
-alias chrome='google-chrome > ~/google-chrome.out 2> ~/google-chrome.err &'
-alias firefox='firefox > ~/firefox.out 2> ~/firefox.err &'
-alias ff='firefox'
-alias emacs="emacs -nw" # start emacs with --no-window-system
-alias paths='echo $PATH | sed "s)\:)\n)g"'
+_user_ps1() {
+  echo -n "\e[92m\u[0m"
+}
+
+export PS1="$(_shlvl_ps1)\e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(_git_ps1)\e[22m\e[39m\n$ "
+
