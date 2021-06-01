@@ -30,6 +30,21 @@ echo 'fi' >> ~/.bashrc
 ./devbin/run
 ```
 
+### Snippets
+
+__~/.ssh/config__
+
+```
+# Example for other systems
+#Host dev
+#    HostName dev.example.com
+#    Port 22000
+#    User louie
+
+Host github.com
+    IdentityFile ~/.ssh/id_rsa
+```
+
 ## Copyright
 
 Copyright (c) Evan Bowling. See [LICENSE](LICENSE).
