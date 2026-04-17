@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Purpose: Extract the frontmatter from a markdown file
+
+if [ $# -ne 1 ]; then
+  echo "USAGE: $0 MARKDOWN_FILE"
+  exit 1
+fi
+
+awk '/^(---|\.\.\.)$/{n++} n==1; n==2{print;exit}' $1
+
