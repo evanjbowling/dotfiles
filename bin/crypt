@@ -1,0 +1,38 @@
+#!/usr/bin/env bash
+# Encrypt a file or directory:
+#   ./crypt encrypt docs
+#   ./crypt encrypt receipt.pdf
+# Decrypt:
+#   ./crypt decrypt docs.tar.gpg
+#   ./crypt decrypt receipt.pdf.gpg
+
+set -euo pipefail
+
+case "${1:-}" in
+  encrypt)
+    path="${2:?Usage: $0 encrypt <file-or-directory>}"
+    if [ -d "$path" ]; then
+      tar cf - "$path" | gpg --symmetric --cipher-algo AES256 -o "${path}.tar.gpg"
+      echo "→ ${path}.tar.gpg"
+    else
+      gpg --symmetric --cipher-algo AES256 -o "${path}.gpg" "$path"
+      echo "→ ${path}.gpg"
+    fi
+    ;;
+  decrypt)
+    file="${2:?Usage: $0 decrypt <file.gpg or file.tar.gpg>}"
+    if [[ "$file" == *.tar.gpg ]]; then
+      gpg --decrypt "$file" | tar xf -
+      echo "→ extracted directory"
+    else
+      out="${file%.gpg}"
+      gpg --decrypt -o "$out" "$file"
+      echo "→ $out"
+    fi
+    ;;
+  *)
+    echo "Usage: $0 {encrypt|decrypt} <path>"
+    exit 1
+    ;;
+esac
+
