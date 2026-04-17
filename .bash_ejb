@@ -1,21 +1,46 @@
 #!/usr/bin/env bash
 
 EJBDOT_HOME="$HOME/.ejb/dotfiles"
-export PATH="${PATH}:${EJBDOT_HOME}/bin"
+if ! echo ":$PATH:" | grep -q ":$EJBDOT_HOME:"; then
+  export PATH="${PATH}:${EJBDOT_HOME}/bin"
+fi
+
+# Colors
+RED=$(tput setaf 1)
+GREEN=$(tput setaf 2)
+YELLOW=$(tput setaf 3)
+BLUE=$(tput setaf 4)
+MAGENTA=$(tput setaf 5)
+CYAN=$(tput setaf 6)
+WHITE=$(tput setaf 7)
+GRAY=$(tput setaf 8)
+RESET=$(tput sgr0)
 
 # PS1
 _git_ps1() {
   local b=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
-  if [ -z "$b" ]; then echo -n ""; else echo -n "($b)"; fi
+  if [ ! -z "$b" ]; then
+    local gray=$(tput setaf 240)
+    printf '\001%s\002(%s\001%s\002' "$gray" "$b" "$RESET"
+    if [ -n "$(git status --short 2>/dev/null)" ]; then
+      printf ' \001%s\002✗\001%s\002' "$RED" "$RESET"
+    fi
+    printf '\001%s\002)\001%s\002' "$gray" "$RESET"
+  fi
 }
 
 _shlvl_ps1() {
-  if [ $SHLVL -gt 1 ]; then echo -n "$SHLVL "; else echo -n ""; fi
+  if [ $SHLVL -gt 1 ]; then echo -n "$SHLVL "; fi
 }
 
-_user_ps1() {
-  echo -n "\e[92m\u[0m"
+_user_host_ps1() {
+  U=$(tput setaf 35)
+  A=$(tput setaf 22)
+  H=$(tput setaf 27)
+  echo -n "\[${U}\]\u\[${RESET}\]\[${A}\]@\[${RESET}\]\[${H}\]\h\[${RESET}\]"
 }
 
-export PS1="$(_shlvl_ps1)\e[92m\u\e[39m:\e[94m\w\e[39m \e[90m\e[2m\$(_git_ps1)\e[22m\e[39m\n$ "
+# default PS1 configuration
+# You can override this in .bashrc
+export PS1="$(_shlvl_ps1)$(_user_host_ps1) \[${BLUE}\]\w\[${RESET}\] \$(_git_ps1)\n\[${WHITE}\]$ "
 
