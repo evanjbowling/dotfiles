@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-docker build -t dotfiles .
+docker build -t ejb-dotfiles .

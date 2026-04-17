@@ -13,8 +13,11 @@ __Files__:
 
 ```bash
 # create dir and clone repo
-mkdir ~/.ejb
-git clone https://github.com/evanjbowling/dotfiles.git ~/.ejb/dotfiles
+if [ ! -d "$HOME/.ejb/dotfiles" ]; then
+  mkdir $HOME/.ejb
+  git clone https://github.com/evanjbowling/dotfiles.git $HOME/.ejb/dotfiles
+  echo "Created $HOME/.ejb/dotfiles"
+fi
 
 # add the following to .bashrc or equivalent
 echo 'if [ -f "$HOME/.ejb/dotfiles/.bash_ejb" ]; then' >> ~/.bashrc
