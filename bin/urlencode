@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+# urlencode - URL encode or decode strings
+# Usage:
+#   urlencode <text>          # encode (default)
+#   urlencode -d <text>       # decode
+#   urlencode --decode <text> # decode
+#   echo "text" | urlencode   # encode from stdin
+#   echo "text" | urlencode -d # decode from stdin
+
+set -euo pipefail
+
+usage() {
+  echo "Usage: $(basename "$0") [-d|--decode] [text...]"
+  echo ""
+  echo "  Encode or decode URL strings."
+  echo ""
+  echo "  Options:"
+  echo "    -d, --decode    Decode a URL-encoded string"
+  echo "    -h, --help      Show this help message"
+  echo ""
+  echo "  Examples:"
+  echo "    $(basename "$0") 'hello world'          # -> hello+world"
+  echo "    $(basename "$0") 'text,that,works'      # -> text%2Cthat%2Cworks"
+  echo "    $(basename "$0") -d 'hello%20world'     # -> hello world"
+  echo "    echo 'hello world' | $(basename "$0")   # encode from stdin"
+  exit 0
+}
+
+decode=false
+
+# Parse flags
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -d|--decode)
+      decode=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      echo "Run '$(basename "$0") --help' for usage." >&2
+      exit 1
+      ;;
+    *)
+      break
+      ;;
+  esac
+done
+
+# Read input: remaining args joined with spaces, or stdin if no args
+if [[ $# -gt 0 ]]; then
+  input="$*"
+elif [[ ! -t 0 ]]; then
+  input="$(cat)"
+else
+  echo "Error: no input provided." >&2
+  echo "Run '$(basename "$0") --help' for usage." >&2
+  exit 1
+fi
+
+if [[ "$decode" == true ]]; then
+  python3 -c "import sys, urllib.parse; print(urllib.parse.unquote_plus(sys.argv[1]))" "$input"
+else
+  python3 -c "import sys, urllib.parse; print(urllib.parse.quote_plus(sys.argv[1]))" "$input"
+fi
