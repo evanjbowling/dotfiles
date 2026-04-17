@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+# Purpose: demonstrate terminal color capabilities
+
+for x in $(seq 0 254); do
+  tput setaf $x
+  echo "TEST test $x - tput setaf $x; echo hello; tput sgr0;"
+  tput sgr0
+done
+
