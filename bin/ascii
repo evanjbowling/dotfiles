@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Purpose: examine a file for non-ascii characters
+file=""
+quiet=false
+
+for arg in "$@"; do
+  case "$arg" in
+    -q|--quiet) quiet=true ;;
+    *) file="$arg" ;;
+  esac
+done
+
+if [[ -z "$file" ]]; then
+  $quiet || echo "Usage: $0 [-q|--quiet] <filename>"
+  exit 1
+fi
+
+if [[ ! -f "$file" ]]; then
+  $quiet || echo "Error: file not found: $file"
+  exit 1
+fi
+
+# First try grep with -P (Perl-compatible regex) and -q (quiet: no output, just exit code).
+# -P enables \x00-\x7F hex range syntax to match anything outside standard ASCII.
+# This works on Linux (GNU grep) but macOS's built-in BSD grep does not support -P,
+# so we suppress the error with 2>/dev/null and fall back to the LC_ALL=C method.
+if grep -qP '[^\x00-\x7F]' "$file" 2>/dev/null || \
+   # Fallback for macOS: LC_ALL=C forces byte-level (C locale) comparison, bypassing
+   # UTF-8 interpretation. The bracket expression [^ -~] matches anything outside
+   # printable ASCII (space 0x20 through tilde 0x7E) plus tab.
+   LC_ALL=C grep -q '[^ -~	]' "$file" 2>/dev/null; then
+  $quiet || (grep -P '[^\x00-\x7F]' "$file" 2>/dev/null || LC_ALL=C grep '[^ -~	]' "$file")
+  exit 1
+fi
+
+exit 0
+
