@@ -25,6 +25,14 @@ echo '  . "$HOME/.ejb/dotfiles/.bash_ejb"' >> ~/.bashrc
 echo 'fi' >> ~/.bashrc
 ```
 
+## Update
+
+```bash
+cd ~/.ejb/dotfiles
+git pull > /dev/null 2>&1
+git reset --hard origin/master > /dev/null 2>&1
+```
+
 ## Development
 
 ### Test
