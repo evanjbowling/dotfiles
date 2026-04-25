@@ -60,7 +60,7 @@ class TestAsciiMissingArgument(unittest.TestCase):
 
     def test_prints_usage_with_no_args(self):
         r = run()
-        self.assertIn("Usage", r.stdout)
+        self.assertIn("usage", r.stdout)
 
 
 class TestAsciiFileNotFound(unittest.TestCase):

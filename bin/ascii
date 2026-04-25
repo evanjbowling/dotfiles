@@ -1,37 +1,42 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 # Purpose: examine a file for non-ascii characters
-file=""
-quiet=false
 
-for arg in "$@"; do
-  case "$arg" in
-    -q|--quiet) quiet=true ;;
-    *) file="$arg" ;;
-  esac
-done
+import argparse
+import pathlib
+import sys
 
-if [[ -z "$file" ]]; then
-  $quiet || echo "Usage: $0 [-q|--quiet] <filename>"
-  exit 1
-fi
 
-if [[ ! -f "$file" ]]; then
-  $quiet || echo "Error: file not found: $file"
-  exit 1
-fi
+def main():
+    parser = argparse.ArgumentParser(
+        prog="ascii",
+        description="Examine a file for non-ASCII characters.",
+    )
+    parser.add_argument("file", type=pathlib.Path, nargs="?")
+    parser.add_argument("-q", "--quiet", action="store_true")
+    args = parser.parse_args()
 
-# First try grep with -P (Perl-compatible regex) and -q (quiet: no output, just exit code).
-# -P enables \x00-\x7F hex range syntax to match anything outside standard ASCII.
-# This works on Linux (GNU grep) but macOS's built-in BSD grep does not support -P,
-# so we suppress the error with 2>/dev/null and fall back to the LC_ALL=C method.
-if grep -qP '[^\x00-\x7F]' "$file" 2>/dev/null || \
-   # Fallback for macOS: LC_ALL=C forces byte-level (C locale) comparison, bypassing
-   # UTF-8 interpretation. The bracket expression [^ -~] matches anything outside
-   # printable ASCII (space 0x20 through tilde 0x7E) plus tab.
-   LC_ALL=C grep -q '[^ -~	]' "$file" 2>/dev/null; then
-  $quiet || (grep -P '[^\x00-\x7F]' "$file" 2>/dev/null || LC_ALL=C grep '[^ -~	]' "$file")
-  exit 1
-fi
+    if args.file is None:
+        if not args.quiet:
+            parser.print_usage()
+        sys.exit(1)
 
-exit 0
+    if not args.file.is_file():
+        if not args.quiet:
+            print(f"Error: file not found: {args.file}")
+        sys.exit(1)
 
+    data = args.file.read_bytes()
+    bad = [
+        line.decode("utf-8", "replace")
+        for line in data.splitlines()
+        if any(b > 127 for b in line)
+    ]
+
+    if bad:
+        if not args.quiet:
+            print("\n".join(bad))
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
