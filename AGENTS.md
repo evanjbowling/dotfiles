@@ -27,6 +27,10 @@ The Docker workflow simulates a fresh install on Ubuntu to verify the dotfiles w
 
 All scripts are self-contained and designed to be portable across macOS (BSD tools) and Linux (GNU tools). Key patterns to be aware of:
 
+## Commits
+
+Use [conventional commit](https://www.conventionalcommits.org/) format: `<type>(<scope>): <description>`. Common types: `feat`, `fix`, `refactor`, `test`, `doc`, `chore`. Omit Co-Authored-By and Made-With trailers.
+
 ## Adding a new bin/ script
 
 1. Add the script to `bin/` with a `#!/usr/bin/env bash` shebang and no extension.
