@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env python3
 # urlencode - URL encode or decode strings
 # Usage:
 #   urlencode <text>          # encode (default)
@@ -7,65 +7,68 @@
 #   echo "text" | urlencode   # encode from stdin
 #   echo "text" | urlencode -d # decode from stdin
 
-set -euo pipefail
+import argparse
+import os
+import sys
+import urllib.parse
 
-usage() {
-  echo "Usage: $(basename "$0") [-d|--decode] [text...]"
-  echo ""
-  echo "  Encode or decode URL strings."
-  echo ""
-  echo "  Options:"
-  echo "    -d, --decode    Decode a URL-encoded string"
-  echo "    -h, --help      Show this help message"
-  echo ""
-  echo "  Examples:"
-  echo "    $(basename "$0") 'hello world'          # -> hello+world"
-  echo "    $(basename "$0") 'text,that,works'      # -> text%2Cthat%2Cworks"
-  echo "    $(basename "$0") -d 'hello%20world'     # -> hello world"
-  echo "    echo 'hello world' | $(basename "$0")   # encode from stdin"
-  exit 0
-}
 
-decode=false
+def main():
+    parser = argparse.ArgumentParser(
+        prog=os.path.basename(sys.argv[0]),
+        description="Encode or decode URL strings.",
+        add_help=False,
+    )
+    parser.add_argument(
+        "-d", "--decode",
+        action="store_true",
+        default=False,
+        help="Decode a URL-encoded string",
+    )
+    parser.add_argument(
+        "-h", "--help",
+        action="store_true",
+        default=False,
+        help="Show this help message",
+    )
+    parser.add_argument("text", nargs="*")
 
-# Parse flags
-while [[ $# -gt 0 ]]; do
-  case "$1" in
-    -d|--decode)
-      decode=true
-      shift
-      ;;
-    -h|--help)
-      usage
-      ;;
-    --)
-      shift
-      break
-      ;;
-    -*)
-      echo "Unknown option: $1" >&2
-      echo "Run '$(basename "$0") --help' for usage." >&2
-      exit 1
-      ;;
-    *)
-      break
-      ;;
-  esac
-done
+    try:
+        args = parser.parse_args()
+    except SystemExit:
+        sys.exit(1)
 
-# Read input: remaining args joined with spaces, or stdin if no args
-if [[ $# -gt 0 ]]; then
-  input="$*"
-elif [[ ! -t 0 ]]; then
-  input="$(cat)"
-else
-  echo "Error: no input provided." >&2
-  echo "Run '$(basename "$0") --help' for usage." >&2
-  exit 1
-fi
+    if args.help:
+        prog = os.path.basename(sys.argv[0])
+        print(f"Usage: {prog} [-d|--decode] [text...]")
+        print()
+        print("  Encode or decode URL strings.")
+        print()
+        print("  Options:")
+        print("    -d, --decode    Decode a URL-encoded string")
+        print("    -h, --help      Show this help message")
+        print()
+        print("  Examples:")
+        print(f"    {prog} 'hello world'          # -> hello+world")
+        print(f"    {prog} 'text,that,works'      # -> text%2Cthat%2Cworks")
+        print(f"    {prog} -d 'hello%20world'     # -> hello world")
+        print(f"    echo 'hello world' | {prog}   # encode from stdin")
+        sys.exit(0)
 
-if [[ "$decode" == true ]]; then
-  python3 -c "import sys, urllib.parse; print(urllib.parse.unquote_plus(sys.argv[1]))" "$input"
-else
-  python3 -c "import sys, urllib.parse; print(urllib.parse.quote_plus(sys.argv[1]))" "$input"
-fi
+    if args.text:
+        text = " ".join(args.text)
+    elif not sys.stdin.isatty():
+        text = sys.stdin.read()
+    else:
+        print(f"Error: no input provided.", file=sys.stderr)
+        print(f"Run '{os.path.basename(sys.argv[0])} --help' for usage.", file=sys.stderr)
+        sys.exit(1)
+
+    if args.decode:
+        print(urllib.parse.unquote_plus(text))
+    else:
+        print(urllib.parse.quote_plus(text))
+
+
+if __name__ == "__main__":
+    main()
