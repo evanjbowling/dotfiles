@@ -19,10 +19,8 @@ if [ ! -d "$HOME/.ejb/dotfiles" ]; then
   echo "Created $HOME/.ejb/dotfiles"
 fi
 
-# add the following to .bashrc or equivalent
-echo 'if [ -f "$HOME/.ejb/dotfiles/.bash_ejb" ]; then' >> ~/.bashrc
-echo '  . "$HOME/.ejb/dotfiles/.bash_ejb"' >> ~/.bashrc
-echo 'fi' >> ~/.bashrc
+# run the install script, then open a new terminal for the changes to take effect
+$HOME/.ejb/dotfiles/install.sh
 ```
 
 ## Update
