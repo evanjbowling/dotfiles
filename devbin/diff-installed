@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Purpose: diff the repo's dotfiles (rendered as install would) against
+#          what's actually installed in $HOME
+
+REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+NAME=$(git config --global user.name 2>/dev/null)
+EMAIL=$(git config --global user.email 2>/dev/null)
+
+_render() {
+  sed -e "s/{{NAME}}/$NAME/g" -e "s/{{EMAIL}}/$EMAIL/g" "$1"
+}
+
+_diff_file() {
+  local src="$1" dest="$2" render="$3"
+  local rendered
+  rendered=$(mktemp)
+  if [ "$render" = "render" ]; then
+    _render "$src" > "$rendered"
+  else
+    cat "$src" > "$rendered"
+  fi
+
+  echo "== $dest =="
+  if [ ! -e "$dest" ]; then
+    echo "  not installed"
+  elif diff -q "$rendered" "$dest" > /dev/null 2>&1; then
+    echo "  up to date"
+  else
+    diff -u "$dest" "$rendered"
+  fi
+  rm -f "$rendered"
+}
+
+_diff_dir() {
+  local src="$1" dest="$2"
+  echo "== $dest =="
+  if [ ! -d "$dest" ]; then
+    echo "  not installed"
+  else
+    diff -rq "$src" "$dest"
+  fi
+}
+
+_diff_file "$REPO_DIR/.gitconfig.tmpl" "$HOME/.gitconfig" render
+_diff_file "$REPO_DIR/.vimrc" "$HOME/.vimrc" plain
+_diff_dir "$REPO_DIR/.emacs.d" "$HOME/.emacs.d"
