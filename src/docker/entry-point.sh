@@ -4,9 +4,7 @@
 mkdir ~/.ejb
 git clone -b "${DOTFILES_REF:-master}" https://github.com/evanjbowling/dotfiles.git ~/.ejb/dotfiles
 
-echo 'if [ -f "$HOME/.ejb/dotfiles/.bash_ejb" ]; then' >> ~/.bashrc
-echo '  . "$HOME/.ejb/dotfiles/.bash_ejb"' >> ~/.bashrc
-echo 'fi' >> ~/.bashrc
+~/.ejb/dotfiles/install --skip-setup --name "Test User" --email "test@example.com"
 
 # create a few nested directories and a git repo with uncommitted files
 mkdir -p ~/apple/banana/carrot/git_temp
