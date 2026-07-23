@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
+# Purpose: build and run the docker test harness, optionally cloning a
+#          specific branch/ref of the dotfiles repo (default: master)
 ./devbin/build
-docker run --rm -it ejb-dotfiles
+docker run --rm -it -e DOTFILES_REF="${1:-master}" ejb-dotfiles

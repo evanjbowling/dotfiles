@@ -36,7 +36,8 @@ git reset --hard origin/master > /dev/null 2>&1
 ### Test
 
 ```bash
-./devbin/run
+./devbin/run                      # tests master
+./devbin/run some-branch-name     # tests a pushed branch/ref instead
 ```
 
 ### Snippets
