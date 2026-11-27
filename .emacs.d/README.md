@@ -1,7 +1,6 @@
 # emacs configuration
 
-Assumed to be symbolically linked such that this directory is
-available at ~/.emacs.d.
+Copied by `./install` such that this directory is available at ~/.emacs.d.
 
 ## Install
 

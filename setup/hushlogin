@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# Purpose: silence the macOS login banner
+
+if [ "$(uname)" = "Darwin" ] && [ ! -e "$HOME/.hushlogin" ]; then
+  touch "$HOME/.hushlogin"
+  echo "Created $HOME/.hushlogin"
+fi

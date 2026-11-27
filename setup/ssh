@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+# Purpose: create ~/.ssh, generate a key if missing, and wire up
+#          ~/.ssh/config for github.com
+
+SSH_DIR="$HOME/.ssh"
+KEY="$SSH_DIR/id_ed25519"
+CONFIG="$SSH_DIR/config"
+
+if [ ! -d "$SSH_DIR" ]; then
+  mkdir -m 700 "$SSH_DIR"
+  echo "Created $SSH_DIR"
+fi
+
+if [ ! -e "$KEY" ]; then
+  EMAIL=$(git config --global user.email 2>/dev/null)
+  if [ -z "$EMAIL" ]; then
+    read -r -p "Email for SSH key comment: " EMAIL
+  fi
+  read -r -p "No SSH key found at $KEY. Generate one? [y/N] " REPLY
+  if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+    ssh-keygen -t ed25519 -C "$EMAIL" -f "$KEY"
+  fi
+fi
+
+if [ -e "$KEY" ]; then
+  if [ ! -e "$CONFIG" ]; then
+    {
+      echo "Host github.com"
+      echo "    IdentityFile $KEY"
+    } > "$CONFIG"
+    chmod 600 "$CONFIG"
+    echo "Created $CONFIG"
+  elif ! grep -q '^Host github\.com$' "$CONFIG"; then
+    {
+      echo ""
+      echo "Host github.com"
+      echo "    IdentityFile $KEY"
+    } >> "$CONFIG"
+    echo "Added github.com entry to $CONFIG"
+  fi
+fi
