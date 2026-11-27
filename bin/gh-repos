@@ -1,0 +1,389 @@
+#!/usr/bin/env bash
+# Purpose: This script keeps a local directory aligned with the repos GitHub
+#          lists for a user or org. The sync command clones missing repos and
+#          fetches the ones already present. The diff command reports which
+#          repos have no local directory and which directories have no repo.
+#          OWNER is either `owner` or `host/owner`; a bare owner means
+#          github.com, and a host/owner pair targets that GitHub Enterprise
+#          server by way of GH_HOST.
+#   Usage: $0 sync OWNER [--dest-dir DIR] [--dry-run]
+#          $0 diff OWNER [--dest-dir DIR]
+
+
+
+REPO_LIMIT=1000
+
+# Print usage, then exit
+#
+# $1 - exit code
+function usage() {
+  local code=$1
+  local me=$(basename "$0")
+  echo "Usage: $me sync OWNER [--dest-dir DIR] [--dry-run]"
+  echo "       $me diff OWNER [--dest-dir DIR]"
+  echo
+  echo "OWNER is either 'owner' or 'host/owner'; a bare owner means github.com."
+  echo "Repos land directly in DIR; OWNER is not appended to it."
+  echo
+  echo "Commands:"
+  echo "  sync   clone the repos missing from DIR, fetch the ones already there"
+  echo "  diff   compare directory names in DIR against OWNER's repos, change nothing"
+  echo
+  echo "Options:"
+  echo "  --dest-dir DIR   directory holding the clones (default: current directory)"
+  echo "  --dry-run        sync only; report what it would do, change nothing"
+  echo
+  echo "Examples:"
+  echo "  $me diff evanjbowling"
+  echo "  $me sync git.company.com/platform-team --dest-dir ~/Documents/git.company.com/platform-team"
+  exit "$code"
+}
+
+# Check that a value is a single safe path segment
+#
+# $1 - value to check
+function is_valid_name() {
+  local name=$1
+  case "$name" in
+    "" | . | .. | *[/\\]*) return 1 ;;
+    -*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Check that a value looks like a hostname
+#
+# $1 - value to check
+function is_valid_host() {
+  local host=$1
+  case "$host" in
+    "" | -* | *[!A-Za-z0-9.-]*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Echo the host an OWNER argument names, defaulting to github.com
+#
+# $1 - OWNER or HOST/OWNER
+function owner_host() {
+  local spec=$1
+  case "$spec" in
+    */*) echo "${spec%/*}" ;;
+    *) echo "github.com" ;;
+  esac
+}
+
+# Echo the user or org an OWNER argument names
+#
+# $1 - OWNER or HOST/OWNER
+function owner_name() {
+  local spec=$1
+  echo "${spec##*/}"
+}
+
+# Check that an OWNER argument is a safe OWNER or HOST/OWNER pair
+#
+# $1 - OWNER or HOST/OWNER
+function is_valid_owner() {
+  local spec=$1
+
+  case "$spec" in
+    */*/*) return 1 ;;
+  esac
+
+  is_valid_name "$(owner_name "$spec")" || return 1
+  is_valid_host "$(owner_host "$spec")"
+}
+
+# Echo the name of each repo owned by OWNER, one per line, sorted
+#
+# The host comes from GH_HOST, which main exports before dispatching
+#
+# $1 - GitHub user or org
+function list_remote_repos() {
+  local owner=$1
+  gh repo list "$owner" --limit "$REPO_LIMIT" --json name --jq '.[].name' \
+    | LC_ALL=C sort
+}
+
+# Echo the name of each visible directory in a directory, one per line, sorted
+#
+# $1 - directory holding the clones
+function list_local_dirs() {
+  local dest=$1
+  local path
+  for path in "$dest"/*/; do
+    if [ -d "$path" ]; then
+      basename "$path"
+    fi
+  done | LC_ALL=C sort
+}
+
+# Check whether a name appears in a newline-separated list
+#
+# $1 - name to look for
+# $2 - newline-separated list
+function list_contains() {
+  local name=$1
+  local list=$2
+  echo "$list" | grep -Fqx -- "$name"
+}
+
+# Echo a one-line description of a local directory
+#
+# $1 - directory path
+function describe_local_dir() {
+  local dir=$1
+
+  if [ ! -d "$dir/.git" ]; then
+    echo "not a git repo"
+    return 0
+  fi
+
+  local remote=$(git -C "$dir" remote get-url origin 2>/dev/null)
+  if [ -z "$remote" ]; then
+    echo "git repo, no origin remote"
+  else
+    echo "git repo, origin $remote"
+  fi
+}
+
+# Echo a one-line report of what a fetch would do to a repo
+#
+# $1 - repo directory
+function describe_repo() {
+  local dir=$1
+  local branch=$(git -C "$dir" symbolic-ref --quiet --short HEAD)
+
+  if [ -z "$branch" ]; then
+    echo "would fetch, no ff (detached HEAD)"
+  elif [ -n "$(git -C "$dir" status --porcelain --untracked-files=no)" ]; then
+    echo "would fetch, no ff ($branch has local changes)"
+  else
+    echo "would fetch, ff $branch if possible"
+  fi
+}
+
+# Fetch a repo, then fast-forward the current branch when that is safe
+#
+# $1 - repo directory
+function update_repo() {
+  local dir=$1
+
+  git -C "$dir" fetch --all --prune --tags --quiet || return 1
+
+  local branch=$(git -C "$dir" symbolic-ref --quiet --short HEAD)
+  if [ -z "$branch" ]; then
+    echo "fetched, no ff (detached HEAD)"
+    return 0
+  fi
+
+  local upstream=$(git -C "$dir" rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>/dev/null)
+  if [ -z "$upstream" ]; then
+    echo "fetched, no ff ($branch has no upstream)"
+    return 0
+  fi
+
+  local head=$(git -C "$dir" rev-parse HEAD)
+  if [ "$head" = "$(git -C "$dir" rev-parse "$upstream")" ]; then
+    echo "fetched, $branch up to date"
+    return 0
+  fi
+
+  if ! git -C "$dir" merge-base --is-ancestor "$head" "$upstream"; then
+    echo "fetched, no ff ($branch diverged from $upstream)"
+    return 0
+  fi
+
+  if [ -n "$(git -C "$dir" status --porcelain --untracked-files=no)" ]; then
+    echo "fetched, no ff ($branch has local changes)"
+    return 0
+  fi
+
+  if ! git -C "$dir" merge --ff-only --quiet "$upstream"; then
+    echo "fetched, no ff ($branch could not fast-forward to $upstream)"
+    return 0
+  fi
+
+  echo "fetched, ff $branch $(git -C "$dir" rev-parse --short "$head")..$(git -C "$dir" rev-parse --short HEAD)"
+}
+
+# Clone or fetch one repo and print its status line
+#
+# $1 - GitHub user or org
+# $2 - repo name
+# $3 - directory holding the clones
+# $4 - "dry" to change nothing, "" otherwise
+function sync_repo() {
+  local owner=$1
+  local name=$2
+  local dest=$3
+  local dry=$4
+  local dir="$dest/$name"
+  local status
+
+  if [ -d "$dir/.git" ]; then
+    if [ "$dry" = "dry" ]; then
+      status=$(describe_repo "$dir")
+    else
+      status=$(update_repo "$dir") || status="fetch failed"
+    fi
+  elif [ -e "$dir" ]; then
+    status="skipped (exists but is not a git repo)"
+  elif [ "$dry" = "dry" ]; then
+    status="would clone"
+  elif gh repo clone "$owner/$name" "$dir" -- --quiet; then
+    status="cloned"
+  else
+    status="clone failed"
+  fi
+
+  printf '%-32s %s\n' "$name" "$status"
+
+  case "$status" in
+    *failed* | *skipped*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+# Clone the repos missing from DIR and fetch the ones already there
+#
+# $1 - GitHub host
+# $2 - GitHub user or org
+# $3 - directory holding the clones
+# $4 - "dry" to change nothing, "" otherwise
+function cmd_sync() {
+  local host=$1
+  local owner=$2
+  local dest=$3
+  local dry=$4
+
+  local repos=$(list_remote_repos "$owner")
+  if [ -z "$repos" ]; then
+    echo "error: gh listed no repos for '$owner' on $host" >&2
+    return 1
+  fi
+
+  echo "Syncing repos for $host/$owner into $dest"
+  local failures=0
+  local name
+  while read -r name; do
+    sync_repo "$owner" "$name" "$dest" "$dry" || failures=$((failures + 1))
+  done <<< "$repos"
+
+  if [ "$failures" -gt 0 ]; then
+    echo "$failures repo(s) failed" >&2
+    return 1
+  fi
+}
+
+# Compare directory names in DIR against OWNER's repos
+#
+# $1 - GitHub host
+# $2 - GitHub user or org
+# $3 - directory holding the clones
+function cmd_diff() {
+  local host=$1
+  local owner=$2
+  local dest=$3
+
+  local repos=$(list_remote_repos "$owner")
+  if [ -z "$repos" ]; then
+    echo "error: gh listed no repos for '$owner' on $host" >&2
+    return 1
+  fi
+  local dirs=$(list_local_dirs "$dest")
+
+  echo "Comparing $host/$owner against $dest"
+  local matched=0
+  local missing=0
+  local extra=0
+  local name
+
+  while read -r name; do
+    if list_contains "$name" "$dirs"; then
+      matched=$((matched + 1))
+    else
+      missing=$((missing + 1))
+      printf '%-8s %s\n' "missing" "$name"
+    fi
+  done <<< "$repos"
+
+  while read -r name; do
+    if [ -z "$name" ] || list_contains "$name" "$repos"; then
+      continue
+    fi
+    extra=$((extra + 1))
+    printf '%-8s %-32s %s\n' "extra" "$name" "$(describe_local_dir "$dest/$name")"
+  done <<< "$dirs"
+
+  echo "$matched matched, $missing missing, $extra extra"
+}
+
+function main() {
+  local command=$1
+  local spec=$2
+  local dest=$PWD
+  local dry=""
+
+  if [ "$command" = "-h" ] || [ "$command" = "--help" ]; then
+    usage 0
+  fi
+
+  case "$command" in
+    sync | diff) ;;
+    "") echo "error: missing command" >&2; usage 1 ;;
+    *) echo "error: unknown command '$command'" >&2; usage 1 ;;
+  esac
+
+  if ! is_valid_owner "$spec"; then
+    echo "error: missing or invalid OWNER; expected 'owner' or 'host/owner'" >&2
+    usage 1
+  fi
+  local host=$(owner_host "$spec")
+  local owner=$(owner_name "$spec")
+  shift 2
+
+  while [ $# -gt 0 ]; do
+    case "$1" in
+      --dest-dir)
+        if [ -z "$2" ]; then
+          echo "error: --dest-dir needs a directory" >&2
+          usage 1
+        fi
+        dest=$2
+        shift 2
+        ;;
+      --dry-run)
+        if [ "$command" != "sync" ]; then
+          echo "error: --dry-run only applies to sync" >&2
+          usage 1
+        fi
+        dry="dry"
+        shift
+        ;;
+      *)
+        echo "error: unknown argument '$1'" >&2
+        usage 1
+        ;;
+    esac
+  done
+
+  for cmd in gh git; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      echo "error: $cmd is not installed" >&2
+      return 1
+    fi
+  done
+
+  if [ ! -d "$dest" ]; then
+    echo "error: no such directory: $dest" >&2
+    return 1
+  fi
+
+  export GH_HOST=$host
+
+  "cmd_$command" "$host" "$owner" "$dest" "$dry"
+}
+
+main "$@"
