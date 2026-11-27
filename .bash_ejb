@@ -42,5 +42,5 @@ _user_host_ps1() {
 
 # default PS1 configuration
 # You can override this in .bashrc
-export PS1="$(_shlvl_ps1)$(_user_host_ps1) \[${BLUE}\]\w\[${RESET}\] \$(_git_ps1)\n\[${WHITE}\]$ "
+export PS1="$(_shlvl_ps1)$(_user_host_ps1) \[${MAGENTA}\]\w\[${RESET}\] \$(_git_ps1)\n\[${WHITE}\]$ "
 
